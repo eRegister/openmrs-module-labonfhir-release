@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN"
+		"https://resources.openmrs.org/doctype/config-1.6.dtd">
+<module configVersion="1.6">
+	
+	<!-- Base Module Properties -->
+	<id>labonfhir</id>
+	<name>Lab on FHIR</name>
+	<version>1.3.1-SNAPSHOT</version>
+	<package>org.openmrs.module.labonfhir</package>
+	<author>ibacher ,moses mutesa</author>
+	<description>
+			A module to support lab order communication between OpenMRS and an LIS like OpenELIS using FHIR-based
+    Laboratory Workflows based on the OpenHIE Specifications.
+	</description>
+
+	<activator>org.openmrs.module.labonfhir.LabOnFhirActivator</activator>
+	
+	<!-- <updateURL>https://modules.openmrs.org/modules/download/labonfhir/update.rdf</updateURL> -->
+	<!-- /Base Module Properties -->
+	
+	<require_version>2.0.5</require_version>
+	
+	<!-- Extensions -->
+	<extension>
+	</extension>
+
+	<aware_of_modules>
+		<aware_of_module>org.openmrs.module.legacyui</aware_of_module>
+	</aware_of_modules>
+
+	<require_modules>
+		<require_module>org.openmrs.event</require_module>
+		<require_module>org.openmrs.module.fhir2</require_module>
+		<require_module >org.openmrs.module.webservices.rest</require_module>
+	</require_modules>
+	
+	<!-- Internationalization -->
+	<!-- All message codes should start with labonfhir.* -->
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+	<messages>
+		<lang>fr</lang>
+		<file>messages_fr.properties</file>
+	</messages>
+	<messages>
+		<lang>es</lang>
+		<file>messages_es.properties</file>
+	</messages>
+	<!-- /Internationalization -->
+
+	<globalProperty>
+		<property>labonfhir.lisUrl</property>
+		<description>The URL for an LIS system like OpenELIS system to communicate with</description>
+		<defaultValue>http://102.37.156.35:5001/fhir</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.lisUserUuid</property>
+		<description>UUID for the service user that represents a LIS like OpenELIS</description>
+		<defaultValue>c1c26908-3f10-11e4-adec-0800271c1b75</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.keystorePath</property>
+		<description>Path to keystore for HttpClient</description>
+		<defaultValue>/ssl/lf.keystore</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.keystorePass</property>
+		<description>Keystore password</description>
+		<defaultValue>testtest</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.truststorePath</property>
+		<description>Path to truststore for HttpClient</description>
+		<defaultValue>/ssl/lf.truststore</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.truststorePass</property>
+		<description>Truststore password</description>
+		<defaultValue>testtest</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.activateFhirPush</property>
+		<description>Switches on/off the FHIR Push Functionality with in the module to an external LIS</description>
+		<defaultValue>true</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.authType</property>
+		<description>HTTP Auth Type ie Basic/SSL</description>
+		<defaultValue>Basic</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.userName</property>
+		<description>User name for HTTP Basic Auth with the LIS</description>
+		<defaultValue>user</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.password</property>
+		<description>Password for HTTP Basic Auth with the LIS</description>
+		<defaultValue>password</defaultValue>
+	</globalProperty>
+	<globalProperty>
+		<property>labonfhir.openmrsPatientIdentifier.uuid</property>
+		<description>Patient Identifier used to generate the FHIR Identifier System</description>
+		<defaultValue>05a29f94-c0ed-11e2-94be-8c13b969e334</defaultValue>
+	</globalProperty>
+
+	<globalProperty>
+		<property>labonfhir.lisIdentifierSystem.url</property>
+		<description>LIS Identifier System url</description>
+		<defaultValue>http://openelis-global.org/pat_nationalId</defaultValue>
+	</globalProperty>
+
+	<globalProperty>
+		<property>labonfhir.orderTestUuids</property>
+		<description>Concept UUIDs to filter by for Test Orders that get sent to the LIS</description>
+		<defaultValue>160046AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,165254AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA,92d73e24-122e-4f3e-8447-fb972f01b617</defaultValue>
+	</globalProperty>
+
+	<globalProperty>
+		<property>labonfhir.labUpdateTriggerObject</property>
+		<description>The OpenMRS object type that should trigger LIS synchronization - either Encounter or Order.</description>
+		<defaultValue>Order</defaultValue>
+	</globalProperty>
+
+	<globalProperty>
+		<property>labonfhir.addObsAsTaskInput</property>
+		<description>Allows Adding Obs as Task Input</description>
+		<defaultValue>false</defaultValue>
+	</globalProperty>
+
+	<globalProperty>
+		<property>labonfhir.filterOrderBytestUuids</property>
+		<description>Allows filtering Oders by Test Uuuids</description>
+		<defaultValue>true</defaultValue>
+	</globalProperty>
+</module>

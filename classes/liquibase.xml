@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ 
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+                  http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+ 
+    <!--
+    	See http://wiki.openmrs.org/display/docs/Module+liquibase+File for 
+    	documentation on this file.
+    
+        See http://www.liquibase.org/manual/home#available_database_refactorings
+        for a list of supported elements and attributes
+    -->
+
+    <changeSet id="create-openelis-pull-task-2020-04-03" author="pmanko" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.labonfhir.api.scheduler.FetchTaskUpdates'
+                And name = 'OpenELIS Pull Task'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting FetchTaskUpdates Task into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="OpenELIS Pull Task" />
+            <column name="description" value="Updates relevant resources fetched from OpenELIS FHIR Server" />
+            <column name="schedulable_class" value="org.openmrs.module.labonfhir.api.scheduler.FetchTaskUpdates" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="now()" />
+            <column name="repeat_interval" value="30" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="start_on_startup" value="0"/>
+            <column name="started" value="0"/>
+            <column name="uuid" value="8c17b376-1a2v-11e1-a51a-00248140a5eb" />
+        </insert>
+    </changeSet>
+    <changeSet id="create-failed_task-table-2023-06-05" author="mozzymutesa" dbms="mysql">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="failed_task"/></not>
+		</preConditions>
+		<comment>
+			Creating the failed_task table
+		</comment>
+		<createTable tableName="failed_task">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+			<column name="error" type="varchar(255)" />
+            <column name="task_uuid" type="char(38)" />
+            <column name="is_sent" type="boolean" />
+            <column name="uuid" type="char(38)">
+				<constraints nullable="false" unique="true"></constraints>
+			</column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="void_reason" type="varchar(255)" />
+            <column name="changed_by" type="int" />
+            <column name="voided_by" type="int" />
+            <column name="creator" type="int" />
+            <column defaultValueBoolean="false" name="voided" type="BOOLEAN"/>
+		</createTable>
+    </changeSet> 
+    <changeSet id="create-retry_failed_tasks-task-2023-06-05" author="mozzymutesa" dbms="mysql">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM scheduler_task_config
+                WHERE schedulable_class = 'org.openmrs.module.labonfhir.api.scheduler.RetryFailedTasks'
+                And name = 'Retry Failed Tasks'
+            </sqlCheck>
+        </preConditions>
+        <comment>Inserting RetryFailedTasks Task into 'schedule_task_config' table</comment>
+        <insert tableName="scheduler_task_config">
+            <column name="name" value="Retry Failed Tasks" />
+            <column name="description" value="Retries to Send Failed Tasks to the LIS" />
+            <column name="schedulable_class" value="org.openmrs.module.labonfhir.api.scheduler.RetryFailedTasks" />
+            <column name="start_time_pattern" value="MM/dd/yyyy HH:mm:ss" />
+            <column name="start_time" valueDate="now()" />
+            <column name="repeat_interval" value="3600" />
+            <column name="date_created" valueDate="CURRENT_TIMESTAMP" />
+            <column name="created_by" value="1" />
+            <column name="start_on_startup" value="1"/>
+            <column name="started" value="0"/>
+            <column name="uuid" value="ae35121c-41e6-46f1-b2a2-0d9d2fa63e74" />
+        </insert>
+    </changeSet>
+    <changeSet id="create-task-request-table-2023-08-24" author="mozzymutesa" dbms="mysql">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="task_request"/></not>
+		</preConditions>
+		<comment>
+			Creating the task_request table
+		</comment>
+		<createTable tableName="task_request">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true" nullable="false"/>
+			</column>
+            <column name="request_date" type="DATETIME"/>
+            <column name="uuid" type="char(38)">
+				<constraints nullable="false" unique="true"></constraints>
+			</column>
+            <column name="date_voided" type="DATETIME"/>
+            <column name="date_changed" type="DATETIME"/>
+            <column name="date_created" type="DATETIME"/>
+            <column name="void_reason" type="varchar(255)" />
+            <column name="changed_by" type="int" />
+            <column name="voided_by" type="int" />
+            <column name="creator" type="int" />
+            <column defaultValueBoolean="false" name="voided" type="BOOLEAN"/>
+		</createTable>
+    </changeSet> 
+    <changeSet id="add-disa lis-to-fhir concept source-2023-11-19" author="lmphatsi" dbms="mysql">
+		<preConditions onFail="MARK_RAN" onError="WARN">
+            <and>
+			    <tableExists tableName="fhir_concept_source"/>
+                <sqlCheck expectedResult="1">
+                    select 1 from concept_reference_source where name = 'LSMOH DISA' and retired = false;
+                </sqlCheck>
+            </and>
+		</preConditions>
+		<comment>
+			Adding disa to fhir_concept sources
+		</comment>
+		<sql><![CDATA[
+            insert into fhir_concept_source (name, concept_source_id, url, creator, date_created, uuid)
+            select name, concept_source_id, 'http://health.gov.ls/laboratory-services/', 1, now(), '7cfc3369-4ec4-4376-b65e-5ac41d527b74'
+            from concept_reference_source
+            where name = 'LSMOH DISA' and retired = false;
+        ]]>    
+        </sql>
+    </changeSet>
+
+    <!-- <changeSet id="create-orders-trigger-to-test-order" author="lmphatsi" dbms="mysql">
+        <comment>
+			Create orders trigger ... add lab tests to testorders
+		</comment>
+        <sqlFile
+            splitStatements="false"
+            stripComments="false"
+            path="create_trigger.sql"/>
+    </changeSet> -->
+    
+</databaseChangeLog>
+
+
